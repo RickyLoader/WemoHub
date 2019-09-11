@@ -26,9 +26,13 @@ public class ApiRequest extends AsyncTask<String, Void, String>{
     }
 
     private ApiResponse apiResponse;
+    private String destination;
+    private boolean useDefault;
 
-    public ApiRequest(ApiResponse apiResponse){
+    public ApiRequest(ApiResponse apiResponse, String destination, boolean useDefault){
         this.apiResponse = apiResponse;
+        this.destination = destination;
+        this.useDefault = useDefault;
     }
 
     @Override
@@ -43,12 +47,12 @@ public class ApiRequest extends AsyncTask<String, Void, String>{
 
             String apiRequest = args[0];
             String method = args[1];
-
-
-            String baseUrl = "http://192.168.1.72/wemo/index.php/api/";
-
-            URL url = new URL(baseUrl + apiRequest);
-            Request.Builder builder = new Request.Builder().url(url);
+            String location = "http://" + destination + "/wemo/index.php/api/"+apiRequest;
+            if(!useDefault){
+                location = "http://" + destination + "/" +apiRequest;
+            }
+            URL url = new URL(location);
+            Request.Builder builder = new Request.Builder().url(url).addHeader("Accept","application/json");
 
             switch(method){
                 case "UPDATE":

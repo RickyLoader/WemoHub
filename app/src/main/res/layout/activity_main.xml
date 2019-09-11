@@ -71,6 +71,51 @@
         app:layout_constraintStart_toStartOf="@+id/image_right_border"
         app:layout_constraintTop_toTopOf="@+id/bottom_margin" />
 
+    <ImageView
+        android:id="@+id/movie_poster_1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/top_margin"
+        app:layout_constraintEnd_toStartOf="@+id/movie_20"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/movie_poster_2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/top_margin"
+        app:layout_constraintEnd_toStartOf="@+id/movie_40"
+        app:layout_constraintStart_toStartOf="@+id/movie_20"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/movie_poster_3"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/top_margin"
+        app:layout_constraintEnd_toStartOf="@+id/movie_60"
+        app:layout_constraintStart_toStartOf="@+id/movie_40"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/movie_poster_4"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/top_margin"
+        app:layout_constraintEnd_toStartOf="@+id/movie_80"
+        app:layout_constraintStart_toStartOf="@+id/movie_60"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/movie_poster_5"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/top_margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/movie_80"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <SeekBar
         android:id="@+id/dim_all_bar"
         android:layout_width="0dp"
@@ -83,6 +128,18 @@
         app:layout_constraintStart_toStartOf="@+id/inner_left_margin"
         app:layout_constraintTop_toTopOf="@+id/bottom_margin" />
 
+    <TextView
+        android:id="@+id/scroll_percentage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="openSettings"
+        android:text="50%"
+        android:textSize="40dp"
+        app:layout_constraintBottom_toTopOf="@+id/text_bottom"
+        app:layout_constraintEnd_toStartOf="@+id/image_right_border"
+        app:layout_constraintStart_toStartOf="@+id/inner_left_margin"
+        app:layout_constraintTop_toTopOf="@+id/text_top" />
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/right_margin"
         android:layout_width="wrap_content"
@@ -92,6 +149,13 @@
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/top_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.16" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/poster_bottom"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -147,6 +211,34 @@
         app:layout_constraintGuide_percent="0.50" />
 
     <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/movie_20"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.2" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/movie_40"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.4" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/movie_60"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.6" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/movie_80"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.8" />
+
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/button_top"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -194,16 +286,5 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.76" />
-
-    <TextView
-        android:id="@+id/scroll_percentage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="50%"
-        android:textSize="40dp"
-        app:layout_constraintBottom_toTopOf="@+id/text_bottom"
-        app:layout_constraintEnd_toStartOf="@+id/image_right_border"
-        app:layout_constraintStart_toStartOf="@+id/inner_left_margin"
-        app:layout_constraintTop_toTopOf="@+id/text_top" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
