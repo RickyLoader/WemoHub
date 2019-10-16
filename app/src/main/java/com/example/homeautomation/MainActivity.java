@@ -3,14 +3,21 @@ package com.example.homeautomation;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
+import android.app.ActionBar;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.util.Half;
 import android.util.Log;
+import android.util.SparseIntArray;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -20,35 +27,104 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends Activity{
 
-    private String destination = "192.168.1.72";
-    HashMap<Integer, Integer> images;
+    private String destination = "192.168.1.81";
+    private SparseIntArray images;
+
+    private boolean run = true;
+    private float beginX;
+    private float endX;
+    private boolean listener = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        createIDMap();
+        createImageMap();
         setContentView(R.layout.activity_main);
         SeekBar allDimBar = findViewById(R.id.dim_all_bar);
         final Room room = new Room("all", (ImageView) findViewById(R.id.blueprint_overlay), allDimBar);
         setSeekListener(room);
         setButtonListener(room, (ImageButton) findViewById(R.id.power_off), false);
         setButtonListener(room, (ImageButton) findViewById(R.id.power_on), true);
-        //startMonitoring(room);
+        startMonitoring(room);
         watchPlex();
     }
 
-    private void createIDMap(){
-        images = new HashMap<>();
+    private void createImageMap(){
+        images = new SparseIntArray();
         images.put(0, R.id.movie_poster_1);
         images.put(1, R.id.movie_poster_2);
         images.put(2, R.id.movie_poster_3);
         images.put(3, R.id.movie_poster_4);
         images.put(4, R.id.movie_poster_5);
+    }
+
+    private int findPosition(Drawable d){
+        for(int i = 0; i < images.size(); i++){
+            int index = images.keyAt(i);
+            ImageView image = findViewById(images.get(index));
+            if(image.getDrawable() == d){
+                return index;
+            }
+        }
+        return -1;
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void addSwipeListener(final ImageView big){
+        big.setOnTouchListener(new View.OnTouchListener(){
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent){
+                switch(motionEvent.getAction()){
+                    case MotionEvent.ACTION_DOWN:
+                        beginX = motionEvent.getX();
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        endX = motionEvent.getX();
+                        float dir = beginX - endX;
+                        int index = findPosition(big.getDrawable());
+                        if(dir == 0){
+                            big.setVisibility(View.GONE);
+                        }
+                        else{
+                            if(dir > 0){
+                                index++;
+                            }
+                            else{
+                                index--;
+                            }
+                            if(index >= 0 && index < images.size()){
+                                ImageView next = findViewById(images.get(index));
+                                big.setImageDrawable(next.getDrawable());
+                            }
+                        }
+                }
+                return false;
+            }
+        });
+    }
+
+    public void posterClick(View poster){
+        ImageView big = findViewById(R.id.big_poster);
+        ImageView small = (ImageView) poster;
+
+        big.setImageDrawable(small.getDrawable());
+        big.setVisibility(View.VISIBLE);
+        if(!listener){
+            addSwipeListener(big);
+            listener = true;
+        }
     }
 
     private void watchPlex(){
@@ -60,56 +136,91 @@ public class MainActivity extends AppCompatActivity{
                     @Override
                     public void response(String json){
                         ArrayList<Movie> movies = Movie.jsonToMovies(json);
+                        int count = 0;
+                        int index = 0;
                         if(movies.size() > 0){
-                            for(int i = 0; i < 5; i++){
-                                Movie movie = movies.get(i);
-                                ImageView image = findViewById(images.get(i));
-                                if(image.getTag() == null || !image.getTag().equals(movie.getImage())){
-                                    image.setTag(movie.getImage());
-                                    Picasso.get().load(movie.getImage()).into(image);
+                            while(count < 5){
+                                if(index == movies.size() - 1){
+                                    return;
                                 }
+                                Movie movie = movies.get(index);
+                                if(!movie.isViewed()){
+                                    ImageView image = findViewById(images.get(count));
+                                    if(image.getTag() == null || !image.getTag().equals(movie.getImage())){
+                                        image.setTag(movie.getImage());
+                                        Picasso.get().load(movie.getImage()).into(image);
+                                    }
+                                    count++;
+                                }
+                                index++;
                             }
                         }
 
                     }
-                }, Movie.getHost(), false).execute("library/sections/1/recentlyAdded/" + Movie.getToken(), "GET");
-                handler.postDelayed(this, 5000);
+                }, Movie.getHost(), false).execute("library/sections/2/recentlyAdded/" + Movie.getToken(), "GET");
+                handler.postDelayed(this, 10000);
             }
         };
         monitorTask.run();
     }
 
     private void startMonitoring(final Room room){
-        final Handler handler = new Handler();
-        final Runnable monitorTask = new Runnable(){
+        final Handler wemoHandler = new Handler();
+        final Runnable wemoMonitorTask = new Runnable(){
             @Override
             public void run(){
-                new ApiRequest(new ApiRequest.ApiResponse(){
+                ApiRequest checkBrightness = new ApiRequest(new ApiRequest.ApiResponse(){
                     @Override
                     public void response(String json){
-                        int brightness = Integer.valueOf(json.trim());
-                        updatePercentage(brightness, 0);
-                        room.setBrightness(brightness, false);
-                        room.getDimBar().setProgress(brightness);
+                        if(!run || json == null || json.isEmpty()){
+                            return;
+                        }
+                        try{
+                            JSONArray bulbs = new JSONArray(json);
+                            int brightness = Math.max(
+                                    Integer.valueOf(bulbs.getJSONObject(0).getString("dim")),
+                                    Integer.valueOf(bulbs.getJSONObject(1).getString("dim"))
+                            );
+                            updatePercentage(brightness, 0);
+                            room.updateDim(brightness);
+                        }
+                        catch(JSONException e){
+                        }
                     }
-                }, destination, true).execute(room.getStatus());
-                handler.postDelayed(this, 5000);
+                }, "192.168.1.65/wemo/index.php/api", false);
+                if(run){
+                    checkBrightness.execute(room.getStatus());
+                }
+                wemoHandler.postDelayed(this, 8000);
             }
         };
-        monitorTask.run();
+        wemoMonitorTask.run();
+    }
+
+    private void pauseMonitor(){
+        run = false;
+    }
+
+    private void resumeMonitor(){
+        run = true;
     }
 
     private void setButtonListener(final Room room, ImageButton button, final boolean on){
         button.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                giveFeedback();
+                pauseMonitor();
                 int brightness = 255;
                 if(!on){
                     brightness = 0;
                 }
                 updatePercentage(brightness, 0);
-                new ApiRequest(null, destination, true).execute(room.setBrightness(brightness, false));
+                new ApiRequest(new ApiRequest.ApiResponse(){
+                    @Override
+                    public void response(String json){
+                        resumeMonitor();
+                    }
+                }, destination, true).execute(room.updateStatus(on));
             }
         });
     }
@@ -125,13 +236,19 @@ public class MainActivity extends AppCompatActivity{
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar){
-                giveFeedback();
+                //giveFeedback();
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar){
-                giveFeedback();
-                new ApiRequest(null, destination, true).execute(room.setBrightness(seekBar.getProgress(), true));
+                //giveFeedback();
+                pauseMonitor();
+                new ApiRequest(new ApiRequest.ApiResponse(){
+                    @Override
+                    public void response(String json){
+                        resumeMonitor();
+                    }
+                }, destination, true).execute(room.setBrightness(seekBar.getProgress(), true));
             }
         });
     }

@@ -47,12 +47,12 @@ public class ApiRequest extends AsyncTask<String, Void, String>{
 
             String apiRequest = args[0];
             String method = args[1];
-            String location = "http://" + destination + "/wemo/index.php/api/"+apiRequest;
+            String location = "http://" + destination + "/wemo/index.php/api/" + apiRequest;
             if(!useDefault){
-                location = "http://" + destination + "/" +apiRequest;
+                location = "http://" + destination + "/" + apiRequest;
             }
             URL url = new URL(location);
-            Request.Builder builder = new Request.Builder().url(url).addHeader("Accept","application/json");
+            Request.Builder builder = new Request.Builder().url(url).addHeader("Accept", "application/json");
 
             switch(method){
                 case "UPDATE":

@@ -15,7 +15,7 @@
         app:layout_constraintBottom_toTopOf="@+id/button_bottom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/inner_right_margin"
-        app:layout_constraintTop_toTopOf="@+id/button_mid" />
+        app:layout_constraintTop_toTopOf="@+id/button_gap_end" />
 
     <ImageButton
         android:id="@+id/power_on"
@@ -23,7 +23,7 @@
         android:layout_height="0dp"
         android:background="@android:color/transparent"
         android:src="@drawable/power_on_button"
-        app:layout_constraintBottom_toTopOf="@+id/button_mid"
+        app:layout_constraintBottom_toTopOf="@+id/button_gap_start"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/inner_right_margin"
         app:layout_constraintTop_toTopOf="@+id/button_top" />
@@ -75,24 +75,27 @@
         android:id="@+id/movie_poster_1"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:onClick="posterClick"
         app:layout_constraintBottom_toTopOf="@+id/top_margin"
         app:layout_constraintEnd_toStartOf="@+id/movie_20"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/poster_top" />
 
     <ImageView
         android:id="@+id/movie_poster_2"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:onClick="posterClick"
         app:layout_constraintBottom_toTopOf="@+id/top_margin"
         app:layout_constraintEnd_toStartOf="@+id/movie_40"
         app:layout_constraintStart_toStartOf="@+id/movie_20"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/poster_top" />
 
     <ImageView
         android:id="@+id/movie_poster_3"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:onClick="posterClick"
         app:layout_constraintBottom_toTopOf="@+id/top_margin"
         app:layout_constraintEnd_toStartOf="@+id/movie_60"
         app:layout_constraintStart_toStartOf="@+id/movie_40"
@@ -102,6 +105,7 @@
         android:id="@+id/movie_poster_4"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:onClick="posterClick"
         app:layout_constraintBottom_toTopOf="@+id/top_margin"
         app:layout_constraintEnd_toStartOf="@+id/movie_80"
         app:layout_constraintStart_toStartOf="@+id/movie_60"
@@ -111,6 +115,7 @@
         android:id="@+id/movie_poster_5"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:onClick="posterClick"
         app:layout_constraintBottom_toTopOf="@+id/top_margin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/movie_80"
@@ -166,14 +171,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.84" />
+        app:layout_constraintGuide_percent="0.90" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/image_bottom"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.92" />
+        app:layout_constraintGuide_percent="0.98" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/left_margin"
@@ -246,18 +251,32 @@
         app:layout_constraintGuide_percent="0.27" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/button_mid"
+        android:id="@+id/button_gap_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.35" />
 
     <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/button_gap_end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.37" />
+
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/button_bottom"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.43" />
+        app:layout_constraintGuide_percent="0.45" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/poster_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/text_top"
@@ -286,5 +305,15 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.76" />
+
+    <ImageView
+        android:id="@+id/big_poster"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
