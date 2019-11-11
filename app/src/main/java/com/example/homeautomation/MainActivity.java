@@ -1,25 +1,13 @@
 package com.example.homeautomation;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
 import android.app.Activity;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Vibrator;
-import android.util.Half;
-import android.util.Log;
 import android.util.SparseIntArray;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -29,16 +17,15 @@ import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
+
 
 public class MainActivity extends Activity{
 
-    private String destination = "192.168.1.81";
+    private String control = "192.168.1.81/wemo/index.php/api/";
+    private String monitor = "192.168.1.65/wemo/index.php/api/";
+
     private SparseIntArray images;
 
     private boolean run = true;
@@ -57,6 +44,8 @@ public class MainActivity extends Activity{
         setSeekListener(room);
         setButtonListener(room, (ImageButton) findViewById(R.id.power_off), false);
         setButtonListener(room, (ImageButton) findViewById(R.id.power_on), true);
+        setPresetListener(room, (ImageButton) findViewById(R.id.night_preset), "night", 1);
+        setPresetListener(room, (ImageButton) findViewById(R.id.movie_preset), "movie", 1);
         startMonitoring(room);
         watchPlex();
     }
@@ -157,7 +146,7 @@ public class MainActivity extends Activity{
                         }
 
                     }
-                }, Movie.getHost(), false).execute("library/sections/2/recentlyAdded/" + Movie.getToken(), "GET");
+                }, Movie.getHost()).execute("/library/sections/2/recentlyAdded/" + Movie.getToken(), "GET");
                 handler.postDelayed(this, 10000);
             }
         };
@@ -187,11 +176,11 @@ public class MainActivity extends Activity{
                         catch(JSONException e){
                         }
                     }
-                }, "192.168.1.65/wemo/index.php/api", false);
+                }, monitor);
                 if(run){
                     checkBrightness.execute(room.getStatus());
                 }
-                wemoHandler.postDelayed(this, 8000);
+                wemoHandler.postDelayed(this, 5000);
             }
         };
         wemoMonitorTask.run();
@@ -220,7 +209,23 @@ public class MainActivity extends Activity{
                     public void response(String json){
                         resumeMonitor();
                     }
-                }, destination, true).execute(room.updateStatus(on));
+                }, control).execute(room.updateStatus(on));
+            }
+        });
+    }
+
+    private void setPresetListener(final Room room, final ImageButton button, final String preset, final int brightness){
+        button.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                pauseMonitor();
+                updatePercentage(brightness, 1);
+                new ApiRequest(new ApiRequest.ApiResponse(){
+                    @Override
+                    public void response(String json){
+                        resumeMonitor();
+                    }
+                }, control).execute(room.activatePreset(preset, brightness));
             }
         });
     }
@@ -236,19 +241,17 @@ public class MainActivity extends Activity{
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar){
-                //giveFeedback();
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar){
-                //giveFeedback();
                 pauseMonitor();
                 new ApiRequest(new ApiRequest.ApiResponse(){
                     @Override
                     public void response(String json){
                         resumeMonitor();
                     }
-                }, destination, true).execute(room.setBrightness(seekBar.getProgress(), true));
+                }, control).execute(room.setBrightness(seekBar.getProgress(), true));
             }
         });
     }
@@ -261,31 +264,5 @@ public class MainActivity extends Activity{
             percent = (int) initial;
         }
         percentIndicator.setText(percent + "%");
-    }
-
-    private void giveFeedback(){
-        Vibrator vibrator = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
-        vibrator.vibrate(50);
-    }
-
-    public void openSettings(View view){
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Update API Destination");
-        LayoutInflater layoutInflater = LayoutInflater.from(this);
-        View dialogView = layoutInflater.inflate(R.layout.update_endpoint_dialog, null);
-        builder.setView(dialogView);
-        builder.setPositiveButton("Update", null);
-        builder.setNegativeButton("Cancel", null);
-        final AlertDialog dialog = builder.create();
-        dialog.show();
-        final EditText endpoint = dialog.findViewById(R.id.endpoint);
-        endpoint.setText(destination);
-        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                destination = endpoint.getText().toString();
-                dialog.dismiss();
-            }
-        });
     }
 }

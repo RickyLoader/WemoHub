@@ -55,4 +55,9 @@ public class Room{
     public String[] getStatus(){
         return new String[]{"info/" + name, "GET"};
     }
+
+    public String[] activatePreset(String preset, int maxBrightness){
+        updateDim(maxBrightness);
+        return new String[]{"control/preset/" + preset, "GET"};
+    }
 }

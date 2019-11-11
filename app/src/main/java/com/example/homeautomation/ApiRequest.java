@@ -1,16 +1,9 @@
 package com.example.homeautomation;
 
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.SeekBar;
 
-import org.json.JSONObject;
 
-import java.lang.ref.WeakReference;
 import java.net.URL;
 
 import okhttp3.MediaType;
@@ -27,12 +20,10 @@ public class ApiRequest extends AsyncTask<String, Void, String>{
 
     private ApiResponse apiResponse;
     private String destination;
-    private boolean useDefault;
 
-    public ApiRequest(ApiResponse apiResponse, String destination, boolean useDefault){
+    public ApiRequest(ApiResponse apiResponse, String destination){
         this.apiResponse = apiResponse;
         this.destination = destination;
-        this.useDefault = useDefault;
     }
 
     @Override
@@ -47,10 +38,8 @@ public class ApiRequest extends AsyncTask<String, Void, String>{
 
             String apiRequest = args[0];
             String method = args[1];
-            String location = "http://" + destination + "/wemo/index.php/api/" + apiRequest;
-            if(!useDefault){
-                location = "http://" + destination + "/" + apiRequest;
-            }
+            String location = "http://" + destination + apiRequest;
+
             URL url = new URL(location);
             Request.Builder builder = new Request.Builder().url(url).addHeader("Accept", "application/json");
 
