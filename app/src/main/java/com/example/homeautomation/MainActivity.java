@@ -15,23 +15,19 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class MainActivity extends Activity{
 
-    private String control = "192.168.1.81/wemo/index.php/api/";
-    private String monitor = "192.168.1.65/wemo/index.php/api/";
-
     private SparseIntArray images;
 
-    private boolean run = true;
     private float beginX;
     private float endX;
     private boolean listener = false;
+
+    private House house;
 
 
     @Override
@@ -39,14 +35,37 @@ public class MainActivity extends Activity{
         super.onCreate(savedInstanceState);
         createImageMap();
         setContentView(R.layout.activity_main);
-        SeekBar allDimBar = findViewById(R.id.dim_all_bar);
-        final Room room = new Room("all", (ImageView) findViewById(R.id.blueprint_overlay), allDimBar);
-        setSeekListener(room);
-        setButtonListener(room, (ImageButton) findViewById(R.id.power_off), false);
-        setButtonListener(room, (ImageButton) findViewById(R.id.power_on), true);
-        setPresetListener(room, (ImageButton) findViewById(R.id.night_preset), "night", 1);
-        setPresetListener(room, (ImageButton) findViewById(R.id.movie_preset), "movie", 1);
-        startMonitoring(room);
+
+        final Room room = new Room("Room", (ImageView) findViewById(R.id.blueprint_overlay_room), (TextView) findViewById(R.id.room_percentage));
+        final Room office = new Room("Office", (ImageView) findViewById(R.id.blueprint_overlay_office), (TextView) findViewById(R.id.office_percentage));
+
+        HashMap<String, Room> rooms = new HashMap<>();
+        rooms.put(room.getName(), room);
+        rooms.put(office.getName(), office);
+
+        house = new House(
+                rooms,
+                (SeekBar) findViewById(R.id.dim_all_bar),
+                (ImageButton) findViewById(R.id.power_on),
+                (ImageButton) findViewById(R.id.power_off)
+                );
+
+        house.startMonitoring();
+        house.addPreset(
+                (ImageButton) findViewById(R.id.night_preset),
+                new Room[]{
+                     new Room("Office",1),
+                     new Room("Room",1)
+                }
+                );
+        house.addPreset(
+                (ImageButton) findViewById(R.id.movie_preset),
+                new Room[]{
+                        new Room("Office",0),
+                        new Room("Room",1)
+                }
+        );
+
         watchPlex();
     }
 
@@ -151,118 +170,5 @@ public class MainActivity extends Activity{
             }
         };
         monitorTask.run();
-    }
-
-    private void startMonitoring(final Room room){
-        final Handler wemoHandler = new Handler();
-        final Runnable wemoMonitorTask = new Runnable(){
-            @Override
-            public void run(){
-                ApiRequest checkBrightness = new ApiRequest(new ApiRequest.ApiResponse(){
-                    @Override
-                    public void response(String json){
-                        if(!run || json == null || json.isEmpty()){
-                            return;
-                        }
-                        try{
-                            JSONArray bulbs = new JSONArray(json);
-                            int brightness = Math.max(
-                                    Integer.valueOf(bulbs.getJSONObject(0).getString("dim")),
-                                    Integer.valueOf(bulbs.getJSONObject(1).getString("dim"))
-                            );
-                            updatePercentage(brightness, 0);
-                            room.updateDim(brightness);
-                        }
-                        catch(JSONException e){
-                        }
-                    }
-                }, monitor);
-                if(run){
-                    checkBrightness.execute(room.getStatus());
-                }
-                wemoHandler.postDelayed(this, 5000);
-            }
-        };
-        wemoMonitorTask.run();
-    }
-
-    private void pauseMonitor(){
-        run = false;
-    }
-
-    private void resumeMonitor(){
-        run = true;
-    }
-
-    private void setButtonListener(final Room room, ImageButton button, final boolean on){
-        button.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                pauseMonitor();
-                int brightness = 255;
-                if(!on){
-                    brightness = 0;
-                }
-                updatePercentage(brightness, 0);
-                new ApiRequest(new ApiRequest.ApiResponse(){
-                    @Override
-                    public void response(String json){
-                        resumeMonitor();
-                    }
-                }, control).execute(room.updateStatus(on));
-            }
-        });
-    }
-
-    private void setPresetListener(final Room room, final ImageButton button, final String preset, final int brightness){
-        button.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                pauseMonitor();
-                updatePercentage(brightness, 1);
-                new ApiRequest(new ApiRequest.ApiResponse(){
-                    @Override
-                    public void response(String json){
-                        resumeMonitor();
-                    }
-                }, control).execute(room.activatePreset(preset, brightness));
-            }
-        });
-    }
-
-    private void setSeekListener(final Room room){
-        room.getDimBar().setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
-                if(fromUser){
-                    updatePercentage(progress, 1);
-                }
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar){
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar){
-                pauseMonitor();
-                new ApiRequest(new ApiRequest.ApiResponse(){
-                    @Override
-                    public void response(String json){
-                        resumeMonitor();
-                    }
-                }, control).execute(room.setBrightness(seekBar.getProgress(), true));
-            }
-        });
-    }
-
-    private void updatePercentage(int progress, int min){
-        TextView percentIndicator = findViewById(R.id.scroll_percentage);
-        int percent = min;
-        if(progress > percent){
-            double initial = Math.ceil((progress / (255d / 100d)));
-            percent = (int) initial;
-        }
-        percentIndicator.setText(percent + "%");
     }
 }

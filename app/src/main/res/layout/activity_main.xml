@@ -61,17 +61,29 @@
         app:layout_constraintTop_toTopOf="@+id/top_margin" />
 
     <ImageView
-        android:id="@+id/blueprint_overlay"
+        android:id="@+id/blueprint_overlay_room"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:alpha="0"
-        android:src="@drawable/blueprint_overlay"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_margin"
+        android:src="@drawable/blueprint_overlay_room"
+        app:layout_constraintBottom_toTopOf="@+id/room_overlay_bot"
         app:layout_constraintEnd_toEndOf="@+id/blueprint"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@+id/left_margin"
-        app:layout_constraintTop_toTopOf="@+id/top_margin"
+        app:layout_constraintTop_toTopOf="@+id/poster_bottom"
         app:layout_constraintVertical_bias="0.0" />
+
+    <ImageView
+        android:id="@+id/blueprint_overlay_office"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:alpha="0"
+        android:src="@drawable/blueprint_overlay_office"
+        app:layout_constraintBottom_toTopOf="@+id/office_overlay_bot"
+        app:layout_constraintEnd_toEndOf="@+id/blueprint"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/left_margin"
+        app:layout_constraintTop_toTopOf="@+id/office_overlay_top" />
 
     <ImageView
         android:id="@+id/moon"
@@ -156,7 +168,7 @@
         app:layout_constraintTop_toTopOf="@+id/bottom_margin" />
 
     <TextView
-        android:id="@+id/scroll_percentage"
+        android:id="@+id/room_percentage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="50%"
@@ -165,6 +177,17 @@
         app:layout_constraintEnd_toStartOf="@+id/image_right_border"
         app:layout_constraintStart_toStartOf="@+id/inner_left_margin"
         app:layout_constraintTop_toTopOf="@+id/text_top" />
+
+    <TextView
+        android:id="@+id/office_percentage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="50%"
+        android:textSize="40dp"
+        app:layout_constraintBottom_toTopOf="@+id/office_bottom"
+        app:layout_constraintEnd_toStartOf="@+id/image_right_border"
+        app:layout_constraintStart_toStartOf="@+id/inner_left_margin"
+        app:layout_constraintTop_toTopOf="@+id/office_top" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/right_margin"
@@ -186,6 +209,13 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.16" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.26" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/bottom_margin"
@@ -354,6 +384,41 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.65" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/room_overlay_bot"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.69" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/office_overlay_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.65" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/office_overlay_bot"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.88" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/office_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.82" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/office_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.68" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/inner_right_margin"
